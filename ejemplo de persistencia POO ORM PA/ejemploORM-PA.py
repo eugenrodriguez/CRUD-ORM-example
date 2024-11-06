@@ -1,9 +1,7 @@
-# ejemploORM-PA.py
 from sqlalchemy.orm import sessionmaker
 from db import engine, Persona
 import mariadb
 
-# Conectar directamente a MariaDB para usar procedimientos almacenados
 conn = mariadb.connect(
     user="root",
     password="12345",
@@ -12,7 +10,6 @@ conn = mariadb.connect(
 )
 cursor = conn.cursor()
 
-# Crear una sesión de SQLAlchemy
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 session = SessionLocal()
 
@@ -61,7 +58,6 @@ class PersonaCRUD:
         self.conn.close()
 
 
-# Instancia de PersonaCRUD
 crud = PersonaCRUD()
 
 
