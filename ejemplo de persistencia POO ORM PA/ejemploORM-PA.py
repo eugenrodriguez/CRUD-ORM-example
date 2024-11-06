@@ -55,14 +55,10 @@ class Persona:
         print(f"Persona con ID {p_id} eliminada.")
 
 
-# Conectar a la base de datos
 db = BaseDeDatos(user="root", password="12345",
                  host="localhost", database="personas_db")
 
-# Crear un objeto de la clase Persona y realizar operaciones
 persona = Persona(db)
-
-# Menú de operaciones
 
 
 def mostrar_menu():
@@ -97,8 +93,6 @@ def mostrar_menu():
             print("Opción no válida. Intente nuevamente.")
 
 
-# Ejecutar el menú
 mostrar_menu()
 
-# Cerrar la conexión
 db.cerrar_conexion()
