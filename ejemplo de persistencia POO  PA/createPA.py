@@ -1,14 +1,16 @@
+# createPA.py
 import mariadb
 
+# Conexión a la base de datos personas_db
 conn = mariadb.connect(
     user="root",
     password="12345",
     host="localhost",
     database="personas_db"
 )
-
 cursor = conn.cursor()
 
+# Crear procedimientos almacenados
 cursor.execute("DROP PROCEDURE IF EXISTS insertar_persona;")
 cursor.execute("DROP PROCEDURE IF EXISTS actualizar_persona;")
 cursor.execute("DROP PROCEDURE IF EXISTS eliminar_persona;")
