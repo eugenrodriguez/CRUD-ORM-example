@@ -89,15 +89,11 @@ class InterfazUsuario:
                 print("Opción no válida. Intente nuevamente.")
 
 
-# Configuración de la base de datos
 DATABASE_URL = "mariadb+mariadbconnector://root:12345@localhost/personas_db"
 
-# Crear la instancia de la base de datos y la interfaz de usuario
 db = BaseDeDatosORM(DATABASE_URL)
 interfaz = InterfazUsuario(db)
 
-# Ejecutar el menú
 interfaz.mostrar_menu()
 
-# Cerrar la conexión a la base de datos al salir
 db.cerrar()
