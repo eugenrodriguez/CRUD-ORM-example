@@ -1,55 +1,4 @@
-import sqlalchemy as db
-from sqlalchemy import create_engine, Column, Integer, String
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
-from db import BaseDeDatos  # Importar la clase desde db.py
-
-Base = declarative_base()
-
-
-class Persona(Base):
-    __tablename__ = 'personas'
-
-    id = Column(Integer, primary_key=True)
-    nombre = Column(String(100))
-    edad = Column(Integer)
-
-
-class BaseDeDatosORM:
-    def __init__(self, database_url):
-        self.engine = create_engine(database_url, echo=True)
-        Base.metadata.create_all(self.engine)
-        Session = sessionmaker(bind=self.engine)
-        self.session = Session()
-
-    def insertar_persona(self, nombre, edad):
-        nueva_persona = Persona(nombre=nombre, edad=edad)
-        self.session.add(nueva_persona)
-        self.session.commit()
-        print(f"Persona {nombre} agregada correctamente.")
-
-    def consultar_personas(self):
-        personas = self.session.query(Persona).all()
-        for persona in personas:
-            print(f"{persona.id}: {persona.nombre}, {persona.edad} años")
-
-    def actualizar_persona(self, id, nuevo_nombre, nueva_edad):
-        persona = self.session.query(Persona).filter(Persona.id == id).first()
-        if persona:
-            persona.nombre = nuevo_nombre
-            persona.edad = nueva_edad
-            self.session.commit()
-            print(f"Persona con ID {id} actualizada.")
-
-    def eliminar_persona(self, id):
-        persona = self.session.query(Persona).filter(Persona.id == id).first()
-        if persona:
-            self.session.delete(persona)
-            self.session.commit()
-            print(f"Persona con ID {id} eliminada.")
-
-    def cerrar(self):
-        self.session.close()
+from db import BaseDeDatos
 
 
 class InterfazUsuario:
@@ -90,11 +39,55 @@ class InterfazUsuario:
                 print("Opción no válida. Intente nuevamente.")
 
 
+class BaseDeDatosORM(BaseDeDatos):
+    def __init__(self, user, password, host, database):
+        super().__init__(user, password, host, database)
+        # Creación de la tabla Persona si no existe
+        self.crear_tabla_persona()
+
+    def crear_tabla_persona(self):
+        query = """
+        CREATE TABLE IF NOT EXISTS personas (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            nombre VARCHAR(100),
+            edad INT
+        );
+        """
+        self.ejecutar(query)
+
+    def insertar_persona(self, nombre, edad):
+        query = "INSERT INTO personas (nombre, edad) VALUES (%s, %s)"
+        self.ejecutar(query, (nombre, edad))
+        print(f"Persona {nombre} agregada correctamente.")
+
+    def consultar_personas(self):
+        query = "SELECT * FROM personas"
+        self.ejecutar(query)
+        personas = self.obtener_resultados()
+        for persona in personas:
+            print(f"{persona[0]}: {persona[1]}, {persona[2]} años")
+
+    def actualizar_persona(self, id, nuevo_nombre, nueva_edad):
+        query = "UPDATE personas SET nombre = %s, edad = %s WHERE id = %s"
+        self.ejecutar(query, (nuevo_nombre, nueva_edad, id))
+        print(f"Persona con ID {id} actualizada.")
+
+    def eliminar_persona(self, id):
+        query = "DELETE FROM personas WHERE id = %s"
+        self.ejecutar(query, (id,))
+        print(f"Persona con ID {id} eliminada.")
+
+
 # Configuración de la base de datos
-DATABASE_URL = "mariadb+mariadbconnector://root:12345@localhost/personas_db"
+DATABASE_CONFIG = {
+    'user': 'root',
+    'password': '12345',
+    'host': 'localhost',
+    'database': 'personas_db'
+}
 
 # Crear la instancia de la base de datos y la interfaz de usuario
-db = BaseDeDatosORM(DATABASE_URL)
+db = BaseDeDatosORM(**DATABASE_CONFIG)
 interfaz = InterfazUsuario(db)
 
 # Ejecutar el menú
